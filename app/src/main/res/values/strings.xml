@@ -9,6 +9,7 @@
     <string name="hint_rename_title_alertdialog">Enter the new title</string>
     <string name="text_title_alertdialog">MyDictionary</string>
     <string name="rename_dictionary_popup_menu">Rename</string>
+    <string name="change_word_popup_menu">Change</string>
     <string name="delete_dictionary_popup_menu">Delete</string>
     <string name="delete_dictionary_text_alertdialog">do you want to remove dictionary?</string>
 
