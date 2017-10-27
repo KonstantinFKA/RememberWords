@@ -1,26 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:columnCount="2"
-    android:useDefaultMargins="true">
+    android:orientation="horizontal">
 
-    <CheckBox
-        android:id="@+id/wordCheckBox"
-        android:layout_width="wrap_content"
+    <GridLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_rowSpan="2"/>
+        android:layout_weight="6"
+        android:columnCount="2"
+        android:useDefaultMargins="true">
 
-    <TextView
-        android:id="@+id/wordTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/black"
-        android:text="TextView" />
+        <CheckBox
+            android:id="@+id/wordCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_rowSpan="2"/>
 
-    <TextView
-        android:id="@+id/translationTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
-</GridLayout>
+        <TextView
+            android:id="@+id/wordTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:text="TextView" />
+
+        <TextView
+            android:id="@+id/translationTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TextView" />
+
+    </GridLayout>
+
+    <ImageButton
+        android:id="@+id/menuWord"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="?android:attr/colorBackground"
+        app:srcCompat="@drawable/ic_more_vert_24dp" />
+
+
+</LinearLayout>
