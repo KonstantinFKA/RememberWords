@@ -1,5 +1,6 @@
 package com.fka.rememberwords.dialogs;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,6 +23,7 @@ import java.util.List;
 
 public class NewWordFragment extends DialogFragment {
     public static final String EXTRA_TITLE = "com.fka.rememberwords.title";
+    public static final String EXTRA_TRANSLATION = "com.fka.rememberwords.translation";
 
     @NonNull
     @Override
@@ -45,21 +47,23 @@ public class NewWordFragment extends DialogFragment {
                                 return;
                             }
                         }
-//                        String title = ((TextInputLayout) view.findViewById(R.id.title_name_input_layout)).getEditText().getText().toString();
-//                        sendResult(Activity.RESULT_OK, title);
+                        String title = ((TextInputLayout) view.findViewById(R.id.word_input_layout)).getEditText().getText().toString();
+                        String translation = ((TextInputLayout) view.findViewById(R.id.translation_input_layout)).getEditText().getText().toString();
+                        sendResult(Activity.RESULT_OK, title, translation);
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .create();
     }
 
-    private void sendResult (int resultCode, String title) {
+    private void sendResult (int resultCode, String title, String translation) {
         if (getTargetFragment() == null) {
             return;
         }
 
         Intent intent = new Intent();
         intent.putExtra(EXTRA_TITLE, title);
+        intent.putExtra(EXTRA_TRANSLATION, translation);
 
         getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
     }

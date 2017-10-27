@@ -1,15 +1,20 @@
 package com.fka.rememberwords;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -95,19 +100,20 @@ public class WordsListFragment extends Fragment {
     }
 
     //возвращается результат от диалогов
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if (resultCode != Activity.RESULT_OK){ //если результат не OK, нечиго не происходит
-//            return;
-//        }
-//
-//        if (requestCode == REQUEST_TITLE) { //результат от NewDictionaryFragment, возвращается наименование нового словаря
-//            //создается новый словарь
-//            String title = data.getStringExtra(NewDictionaryFragment.EXTRA_TITLE);
-//            Dictionary dictionary = new Dictionary(title);
-//            DictionaryLab.getDictionaryLab(getActivity()).addDictionary(dictionary);
-//            updateUI();
-//        }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != Activity.RESULT_OK){ //если результат не OK, нечиго не происходит
+            return;
+        }
+
+        if (requestCode == REQUEST_WORD) { //результат от NewWordFragment, возвращается наименование нового словаря
+            //создается новый словарь
+            String title = data.getStringExtra(NewWordFragment.EXTRA_TITLE);
+            String translation = data.getStringExtra(NewWordFragment.EXTRA_TRANSLATION);
+            Word newWord = new Word(idDictionary, title, translation);
+            WordLab.getWordLab(getActivity()).addWord(newWord);
+            updateUI();
+        }
 //
 //        if (requestCode == REQUEST_DELETE) {
 //            //удалить выбранный словарь
@@ -126,7 +132,7 @@ public class WordsListFragment extends Fragment {
 //            DictionaryLab.getDictionaryLab(getActivity()).updateDictionary(dictionary);
 //            updateUI();
 //        }
-//    }
+    }
 
     //обновление списка словарей
     private void updateUI () {
@@ -148,7 +154,7 @@ public class WordsListFragment extends Fragment {
     private class WordHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public TextView wordTextView;
         public TextView translationTextView;
- //       public ImageButton menuWordButton;
+        public ImageButton menuWordButton;
 
         public WordHolder(final View itemView) {
             super(itemView);
@@ -157,13 +163,13 @@ public class WordsListFragment extends Fragment {
             wordTextView = (TextView) itemView.findViewById(R.id.wordTextView);
             translationTextView = (TextView) itemView.findViewById(R.id.translationTextView);
 
-//            menuDictionaryButton = (ImageButton) itemView.findViewById(R.id.menuDictionary);
-//            menuDictionaryButton.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    showPopupMenu(menuDictionaryButton, uuid);
-//                }
-//            });
+            menuWordButton = (ImageButton) itemView.findViewById(R.id.menuWord);
+            menuWordButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    showPopupMenu(menuWordButton);
+                }
+            });
         }
 
         @Override
@@ -200,35 +206,36 @@ public class WordsListFragment extends Fragment {
         }
     }
 
-    //всплывающее меню для словаря
-//    private void showPopupMenu (final View view, final UUID id) {
-//        PopupMenu popupMenu = new PopupMenu(getActivity(), view);
-//        popupMenu.getMenuInflater().inflate(R.menu.didctionary_popup_menu, popupMenu.getMenu());
-//
-//        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(MenuItem item) {
-//                FragmentManager manager = getFragmentManager();
-//                switch (item.getItemId()){
-//                    case R.id.rename_dictionary_popup_menu:     //диалог преименования словаря
+    //всплывающее меню для слова
+ //   private void showPopupMenu (final View view, final UUID id) {
+    private void showPopupMenu (final View view) {
+        PopupMenu popupMenu = new PopupMenu(getActivity(), view);
+        popupMenu.getMenuInflater().inflate(R.menu.word_popup_menu, popupMenu.getMenu());
+
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                FragmentManager manager = getFragmentManager();
+                switch (item.getItemId()){
+                    case R.id.change_word_popup_menu:     //диалог преименования словаря
 //                        Dictionary dictionary = DictionaryLab.getDictionaryLab(getActivity()).getDictionary(id);
 //                        String title = dictionary.getTitle();
 //                        RenameDictionaryFragment dialogRename = RenameDictionaryFragment.newInstance(title, id);
 //                        dialogRename.setTargetFragment(WordsListFragment.this, REQUEST_RENAME);
 //                        dialogRename.show(manager, DIALOG_RENAME_POPUP);
-//                        return true;
-//                    case R.id.delete_dictionary_popup_menu:     //диалог удаления словаря
+                        return true;
+                    case R.id.delete_word_popup_menu:     //диалог удаления словаря
 //                        DeleteDictionaryFragment dialogDelete = DeleteDictionaryFragment.newInstance(id);
 //                        dialogDelete.setTargetFragment(WordsListFragment.this, REQUEST_DELETE);
 //                        dialogDelete.show(manager, DIALOG_DELETE_POPUP);
-//                        return true;
-//                    default:
-//                        return false;
-//                }
-//            }
-//        });
-//
-//        popupMenu.show();
-//
-//    }
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+
+        popupMenu.show();
+
+    }
 }
