@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/rename_dictionary_popup_menu"
+        android:title="@string/rename_dictionary_popup_menu"/>
+    <item
+        android:id="@+id/delete_dictionary_popup_menu"
+        android:title="@string/delete_dictionary_popup_menu"/>
+
+</menu>

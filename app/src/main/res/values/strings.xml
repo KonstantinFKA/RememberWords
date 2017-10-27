@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">RememberWords</string>
+    <string name="new_dictionary_title_alertdialog">Create the dictionary</string>
+    <string name="new_word_title_alertdialog">Create a word</string>
+    <string name="rename_dictionary_title_alertdialog">Rename dictionary</string>
+    <string name="hint_title_alertdialog">Enter a title</string>
+    <string name="hint_word_alertdialog">Enter a word</string>
+    <string name="hint_translation_alertdialog">Enter a translation</string>
+    <string name="hint_rename_title_alertdialog">Enter the new title</string>
+    <string name="text_title_alertdialog">MyDictionary</string>
+    <string name="rename_dictionary_popup_menu">Rename</string>
+    <string name="delete_dictionary_popup_menu">Delete</string>
+    <string name="delete_dictionary_text_alertdialog">do you want to remove dictionary?</string>
+
+    <item name="visible" type="id"/>
+    <item name="masked" type="id"/>
+</resources>
