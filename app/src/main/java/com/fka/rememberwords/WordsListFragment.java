@@ -18,6 +18,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.fka.rememberwords.dialogs.DeleteWordFragment;
 import com.fka.rememberwords.dialogs.NewWordFragment;
 import com.fka.rememberwords.labs.WordLab;
 import com.fka.rememberwords.objects.Word;
@@ -36,7 +37,7 @@ public class WordsListFragment extends Fragment {
     private static final String ARG_ID_DICTIONARY = "id_dictionary";
 
     private static final int REQUEST_WORD = 0;
-//    private static final int REQUEST_DELETE = 1;
+    private static final int REQUEST_WORD_DELETE = 1;
 //    private static final int REQUEST_RENAME = 2;
 
     private RecyclerView wordsRecyclerView;
@@ -114,14 +115,14 @@ public class WordsListFragment extends Fragment {
             WordLab.getWordLab(getActivity()).addWord(newWord);
             updateUI();
         }
-//
-//        if (requestCode == REQUEST_DELETE) {
-//            //удалить выбранный словарь
-//            UUID id = (UUID) data.getSerializableExtra(DeleteDictionaryFragment.EXTRA_DEL_UUID);
-//            Dictionary dictionary = DictionaryLab.getDictionaryLab(getActivity()).getDictionary(id);
-//            DictionaryLab.getDictionaryLab(getActivity()).deleteDictionary(dictionary);
-//            updateUI();
-//        }
+
+        if (requestCode == REQUEST_WORD_DELETE) {
+            //удалить выбранное слово
+            String wordString = (String) data.getSerializableExtra(DeleteWordFragment.EXTRA_DEL_WORD);
+            Word word = WordLab.getWordLab(getActivity()).getWord(wordString);
+            WordLab.getWordLab(getActivity()).deleteWord(word);
+            updateUI();
+        }
 //
 //        if (requestCode == REQUEST_RENAME) {
 //            //переиминовать выбранный словарь
@@ -155,6 +156,7 @@ public class WordsListFragment extends Fragment {
         public TextView wordTextView;
         public TextView translationTextView;
         public ImageButton menuWordButton;
+        public Word word;
 
         public WordHolder(final View itemView) {
             super(itemView);
@@ -167,7 +169,7 @@ public class WordsListFragment extends Fragment {
             menuWordButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    showPopupMenu(menuWordButton);
+                    showPopupMenu(menuWordButton, word);
                 }
             });
         }
@@ -198,6 +200,7 @@ public class WordsListFragment extends Fragment {
             Word word = words.get(position);
             holder.wordTextView.setText(word.getWord());
             holder.translationTextView.setText(word.getTranslation());
+            holder.word = word;
         }
 
         @Override
@@ -208,7 +211,7 @@ public class WordsListFragment extends Fragment {
 
     //всплывающее меню для слова
  //   private void showPopupMenu (final View view, final UUID id) {
-    private void showPopupMenu (final View view) {
+    private void showPopupMenu (final View view, final Word word) {
         PopupMenu popupMenu = new PopupMenu(getActivity(), view);
         popupMenu.getMenuInflater().inflate(R.menu.word_popup_menu, popupMenu.getMenu());
 
@@ -225,9 +228,9 @@ public class WordsListFragment extends Fragment {
 //                        dialogRename.show(manager, DIALOG_RENAME_POPUP);
                         return true;
                     case R.id.delete_word_popup_menu:     //диалог удаления словаря
-//                        DeleteDictionaryFragment dialogDelete = DeleteDictionaryFragment.newInstance(id);
-//                        dialogDelete.setTargetFragment(WordsListFragment.this, REQUEST_DELETE);
-//                        dialogDelete.show(manager, DIALOG_DELETE_POPUP);
+                        DeleteWordFragment dialogWordDelete = DeleteWordFragment.newInstance(word.getWord());
+                        dialogWordDelete.setTargetFragment(WordsListFragment.this, REQUEST_WORD_DELETE);
+                        dialogWordDelete.show(manager, DIALOG_DELETE_WORD_POPUP);
                         return true;
                     default:
                         return false;

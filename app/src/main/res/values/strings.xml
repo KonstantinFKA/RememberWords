@@ -12,6 +12,7 @@
     <string name="change_word_popup_menu">Change</string>
     <string name="delete_dictionary_popup_menu">Delete</string>
     <string name="delete_dictionary_text_alertdialog">do you want to remove dictionary?</string>
+    <string name="delete_word_text_alertdialog">do you want to remove word?</string>
 
     <item name="visible" type="id"/>
     <item name="masked" type="id"/>

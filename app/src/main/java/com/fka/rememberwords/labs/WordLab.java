@@ -71,8 +71,8 @@ public class WordLab {
         return words;
     }
 
-    public Word getWord (Word word){
-        WordCursorWrapper cursor = queryWord(WordTable.Cols.WORD + " = ?", new String[]{word.toString()});
+    public Word getWord (String word){
+        WordCursorWrapper cursor = queryWord(WordTable.Cols.WORD + " = ?", new String[]{word});
 
         try {
             if (cursor.getCount() == 0){
