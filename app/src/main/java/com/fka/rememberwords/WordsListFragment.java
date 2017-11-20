@@ -20,7 +20,7 @@ import android.widget.Toast;
 
 import com.fka.rememberwords.dialogs.DeleteWordFragment;
 import com.fka.rememberwords.dialogs.NewWordFragment;
-import com.fka.rememberwords.labs.WordLab;
+import com.fka.rememberwords.data.WordLab;
 import com.fka.rememberwords.objects.Word;
 
 import java.util.ArrayList;
@@ -108,7 +108,7 @@ public class WordsListFragment extends Fragment {
         }
 
         if (requestCode == REQUEST_WORD) { //результат от NewWordFragment, возвращается наименование нового словаря
-            //создается новый словарь
+            //создается новое слово
             String title = data.getStringExtra(NewWordFragment.EXTRA_TITLE);
             String translation = data.getStringExtra(NewWordFragment.EXTRA_TRANSLATION);
             Word newWord = new Word(idDictionary, title, translation);

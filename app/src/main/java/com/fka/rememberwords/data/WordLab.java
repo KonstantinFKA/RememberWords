@@ -1,12 +1,10 @@
-package com.fka.rememberwords.labs;
+package com.fka.rememberwords.data;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.fka.rememberwords.data.WordBaseHelper;
-import com.fka.rememberwords.data.WordCursorWrapper;
 import com.fka.rememberwords.data.WordDB.WordTable;
 import com.fka.rememberwords.objects.Word;
 

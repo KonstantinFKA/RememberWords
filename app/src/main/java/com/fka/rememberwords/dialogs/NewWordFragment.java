@@ -15,7 +15,7 @@ import android.widget.Toast;
 
 import com.fka.rememberwords.R;
 import com.fka.rememberwords.objects.Word;
-import com.fka.rememberwords.labs.WordLab;
+import com.fka.rememberwords.data.WordLab;
 
 import java.util.List;
 

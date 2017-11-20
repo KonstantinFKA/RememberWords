@@ -21,7 +21,7 @@ import android.widget.TextView;
 import com.fka.rememberwords.dialogs.DeleteDictionaryFragment;
 import com.fka.rememberwords.dialogs.NewDictionaryFragment;
 import com.fka.rememberwords.dialogs.RenameDictionaryFragment;
-import com.fka.rememberwords.labs.DictionaryLab;
+import com.fka.rememberwords.data.DictionaryLab;
 import com.fka.rememberwords.objects.Dictionary;
 
 import java.util.List;
