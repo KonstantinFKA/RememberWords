@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import com.fka.rememberwords.R;
+import com.fka.rememberwords.data.realm.RealmController;
 
 import java.util.UUID;
 
@@ -20,21 +21,19 @@ import java.util.UUID;
  * Created by 074FrantsuzovKA on 05.10.2017.
  */
 
-public class RenameDictionaryFragment extends DialogFragment {
-    public static final String EXTRA_TITLE = "com.fka.rememberwords.title";
-    public static final String EXTRA_RENAME_UUID = "com.fka.rememberwords.id.rename";
+public class EditDictionaryFragment extends DialogFragment {
     private static final String ARG_TITLE = "title";
-    private static final String ARG_UUID_RENAME = "uuid_rename";
+    private static final String ARG_ID_RENAME = "id_rename";
 
     private TextInputLayout titleInputLayout;
 
-    public static RenameDictionaryFragment newInstance(String title, UUID  id) {
+    public static EditDictionaryFragment newInstance(String title, int  id) {
 
         Bundle args = new Bundle();
         args.putSerializable(ARG_TITLE, title);
-        args.putSerializable(ARG_UUID_RENAME, id);
+        args.putSerializable(ARG_ID_RENAME, id);
 
-        RenameDictionaryFragment fragment = new RenameDictionaryFragment();
+        EditDictionaryFragment fragment = new EditDictionaryFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -44,7 +43,7 @@ public class RenameDictionaryFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final String title = (String) getArguments().getSerializable(ARG_TITLE);
-        final UUID id = (UUID) getArguments().getSerializable(ARG_UUID_RENAME);
+        final int id = getArguments().getInt(ARG_ID_RENAME);
 
         final View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_rename_dictionary, null);
         titleInputLayout = view.findViewById(R.id.title_rename_input_layout);
@@ -57,7 +56,8 @@ public class RenameDictionaryFragment extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String newTitle = titleInputLayout.getEditText().getText().toString();
-                        sendResult(Activity.RESULT_OK, id, newTitle);
+                        new RealmController().updateDictionary(id, newTitle);
+                        sendResult(Activity.RESULT_OK);
 
                     }
                 })
@@ -65,13 +65,11 @@ public class RenameDictionaryFragment extends DialogFragment {
                 .create();
     }
 
-    private void sendResult(int resultCode, UUID id, String title) {
+    private void sendResult(int resultCode) {
         if (getTargetFragment() == null) {
             return;
         }
-        Intent intent = new Intent();
-        intent.putExtra(EXTRA_RENAME_UUID, id);
-        intent.putExtra(EXTRA_TITLE, title);
-        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
+
+        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, null);
     }
 }

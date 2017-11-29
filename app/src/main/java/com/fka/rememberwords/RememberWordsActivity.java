@@ -5,6 +5,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.fka.rememberwords.data.realm.RealmController;
+
 //главная Activity приложения, управляющая всеми фрагментами
 
 public class RememberWordsActivity extends AppCompatActivity {
@@ -22,5 +24,11 @@ public class RememberWordsActivity extends AppCompatActivity {
             fragment = new DictionaryListFragment();
             fm.beginTransaction().add(R.id.fragment_container, fragment).commit();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        new RealmController().closeRealm(); //закрыть БД Realm при завершении приложения
     }
 }

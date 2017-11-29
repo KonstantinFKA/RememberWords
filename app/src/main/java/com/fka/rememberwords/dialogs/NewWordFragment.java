@@ -14,22 +14,31 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.fka.rememberwords.R;
-import com.fka.rememberwords.objects.Word;
-import com.fka.rememberwords.data.WordLab;
+import com.fka.rememberwords.data.realm.RealmController;
 
 import java.util.List;
 
 //AlertDialog добовления словоря
 
 public class NewWordFragment extends DialogFragment {
-    public static final String EXTRA_TITLE = "com.fka.rememberwords.title";
-    public static final String EXTRA_TRANSLATION = "com.fka.rememberwords.translation";
+    public static final String ARG_ID_DICTIONARY = "dictionaryId";
+
+    public static NewWordFragment newInstance(int dictionaryId) {
+
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_ID_DICTIONARY, dictionaryId);
+
+        NewWordFragment fragment = new NewWordFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        final int dictionaryId = getArguments().getInt(ARG_ID_DICTIONARY);
+
         final View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_new_word, null);
-        final TextInputLayout wordInputLayout = (TextInputLayout) view.findViewById(R.id.word_input_layout);
 
         return new AlertDialog.Builder(getActivity())
                 .setView(view)
@@ -37,34 +46,31 @@ public class NewWordFragment extends DialogFragment {
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        String word = wordInputLayout.getEditText().getText().toString();
-                        List<Word> words = WordLab.getWordLab(getActivity()).getWords();
-
-                        for (int y = 0; y < words.size(); y++) {
-                            String wordString = words.get(y).getWord();
-                            if (wordString.equals(word)) {
-                                Toast.makeText(getActivity(), "Слово уже существует", Toast.LENGTH_SHORT).show();
-                                return;
-                            }
-                        }
+//                        String word = wordInputLayout.getEditText().getText().toString();
+//                        List<Word> words = WordLab.getWordLab(getActivity()).getWords();
+//
+//                        for (int y = 0; y < words.size(); y++) {
+//                            String wordString = words.get(y).getWord();
+//                            if (wordString.equals(word)) {
+//                                Toast.makeText(getActivity(), "Слово уже существует", Toast.LENGTH_SHORT).show();
+//                                return;
+//                            }
+//                        }
                         String title = ((TextInputLayout) view.findViewById(R.id.word_input_layout)).getEditText().getText().toString();
                         String translation = ((TextInputLayout) view.findViewById(R.id.translation_input_layout)).getEditText().getText().toString();
-                        sendResult(Activity.RESULT_OK, title, translation);
+                        new RealmController().addWord(dictionaryId, title, translation);      //создать слово
+                        sendResult(Activity.RESULT_OK);
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .create();
     }
 
-    private void sendResult (int resultCode, String title, String translation) {
+    private void sendResult (int resultCode) {
         if (getTargetFragment() == null) {
             return;
         }
 
-        Intent intent = new Intent();
-        intent.putExtra(EXTRA_TITLE, title);
-        intent.putExtra(EXTRA_TRANSLATION, translation);
-
-        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
+        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, null);
     }
 }

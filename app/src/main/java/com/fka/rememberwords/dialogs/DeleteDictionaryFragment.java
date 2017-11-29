@@ -10,19 +10,20 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 
 import com.fka.rememberwords.R;
+import com.fka.rememberwords.data.realm.RealmController;
 
 import java.util.UUID;
 
 //AlertDialog удаления словаря
 
 public class DeleteDictionaryFragment extends DialogFragment {
-    public static final String EXTRA_DEL_UUID = "com.fka.rememberwords.id.delete";
-    private static final String ARG_DEL_UUID = "uuid";
+  //  public static final String EXTRA_DEL_UUID = "com.fka.rememberwords.id.delete";
+    private static final String ARG_DEL_ID = "id";
 
-    public static DeleteDictionaryFragment newInstance(UUID id) {
+    public static DeleteDictionaryFragment newInstance(int id) {
 
         Bundle args = new Bundle();
-        args.putSerializable(ARG_DEL_UUID, id);
+        args.putInt(ARG_DEL_ID, id);
 
         DeleteDictionaryFragment fragment = new DeleteDictionaryFragment();
         fragment.setArguments(args);
@@ -33,26 +34,25 @@ public class DeleteDictionaryFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final UUID id = (UUID) getArguments().getSerializable(ARG_DEL_UUID);
+        final int id = getArguments().getInt(ARG_DEL_ID);
 
         return new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.delete_dictionary_text_alertdialog)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        sendResult(Activity.RESULT_OK, id);
+                        new RealmController().removeDictionary(id);
+                        sendResult(Activity.RESULT_OK);
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .create();
     }
 
-    private void sendResult(int resultCode, UUID id) {
+    private void sendResult(int resultCode) {
         if (getTargetFragment() == null) {
             return;
         }
-        Intent intent = new Intent();
-        intent.putExtra(EXTRA_DEL_UUID, id);
-        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
+        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, null);
     }
 }

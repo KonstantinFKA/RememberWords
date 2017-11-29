@@ -14,18 +14,21 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.fka.rememberwords.data.realm.DictionaryRealm;
+import com.fka.rememberwords.data.realm.RealmController;
+import com.fka.rememberwords.data.realm.WordRealm;
+import com.fka.rememberwords.dialogs.EditWordFragment;
 import com.fka.rememberwords.dialogs.DeleteWordFragment;
 import com.fka.rememberwords.dialogs.NewWordFragment;
-import com.fka.rememberwords.data.WordLab;
-import com.fka.rememberwords.objects.Word;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import io.realm.OrderedRealmCollection;
+import io.realm.RealmRecyclerViewAdapter;
 
 //фрагмент со списком слов и кнопкой добовления нового слова
 
@@ -38,22 +41,22 @@ public class WordsListFragment extends Fragment {
 
     private static final int REQUEST_WORD = 0;
     private static final int REQUEST_WORD_DELETE = 1;
-//    private static final int REQUEST_RENAME = 2;
+    private static final int REQUEST_EDIT_WORD = 2;
 
     private RecyclerView wordsRecyclerView;
     private FloatingActionButton addWordFAB;
-    private WordAdapter adapter;
-    private UUID idDictionary;
+    private WordRecyclerAdapter adapter;
+    private int idDictionary;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
-    public static WordsListFragment newInstance(UUID id) {
+    public static WordsListFragment newInstance(int id) {
 
         Bundle args = new Bundle();
-        args.putSerializable(ARG_ID_DICTIONARY, id);
+        args.putInt(ARG_ID_DICTIONARY, id);
 
         WordsListFragment fragment = new WordsListFragment();
         fragment.setArguments(args);
@@ -64,7 +67,7 @@ public class WordsListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fargment_words, container, false);
-        final UUID id = (UUID) getArguments().getSerializable(ARG_ID_DICTIONARY);
+        final int id = getArguments().getInt(ARG_ID_DICTIONARY);
         idDictionary = id;
 
         addWordFAB = (FloatingActionButton) v.findViewById(R.id.addWordFAB);
@@ -72,22 +75,9 @@ public class WordsListFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 FragmentManager manager = getFragmentManager();
-                NewWordFragment dialog = new NewWordFragment();
+                NewWordFragment dialog = NewWordFragment.newInstance(idDictionary);
                 dialog.setTargetFragment(WordsListFragment.this, REQUEST_WORD);
                 dialog.show(manager, DIALOG_NEW_WORD);
-
-//                Word word = new Word(id, "Test slovo4", "perevod1");
-//                List<Word> words = WordLab.getWordLab(getActivity()).getWords();
-//
-//                for (int i = 0; i < words.size(); i++) {
-//                    String wordString = words.get(i).getWord();
-//                    if (wordString.equals(word.getWord())){
-//                        Toast.makeText(getActivity(), "Слово уже существует", Toast.LENGTH_SHORT).show();
-//                        return;
-//                    }
-//                }
-//                WordLab.getWordLab(getActivity()).addWord(word);
-//            updateUI();
             }
         });
 
@@ -100,6 +90,12 @@ public class WordsListFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateUI();
+    }
+
     //возвращается результат от диалогов
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -107,56 +103,32 @@ public class WordsListFragment extends Fragment {
             return;
         }
 
-        if (requestCode == REQUEST_WORD) { //результат от NewWordFragment, возвращается наименование нового словаря
-            //создается новое слово
-            String title = data.getStringExtra(NewWordFragment.EXTRA_TITLE);
-            String translation = data.getStringExtra(NewWordFragment.EXTRA_TRANSLATION);
-            Word newWord = new Word(idDictionary, title, translation);
-            WordLab.getWordLab(getActivity()).addWord(newWord);
+        if (requestCode == REQUEST_WORD) { //результат от NewWordFragment
             updateUI();
         }
 
         if (requestCode == REQUEST_WORD_DELETE) {
-            //удалить выбранное слово
-            String wordString = (String) data.getSerializableExtra(DeleteWordFragment.EXTRA_DEL_WORD);
-            Word word = WordLab.getWordLab(getActivity()).getWord(wordString);
-            WordLab.getWordLab(getActivity()).deleteWord(word);
             updateUI();
         }
-//
-//        if (requestCode == REQUEST_RENAME) {
-//            //переиминовать выбранный словарь
-//            String title = (String) data.getSerializableExtra(RenameDictionaryFragment.EXTRA_TITLE);
-//            UUID id = (UUID) data.getSerializableExtra(RenameDictionaryFragment.EXTRA_RENAME_UUID);
-//            Dictionary dictionary = DictionaryLab.getDictionaryLab(getActivity()).getDictionary(id);
-//            dictionary.setTitle(title);
-//            DictionaryLab.getDictionaryLab(getActivity()).updateDictionary(dictionary);
-//            updateUI();
-//        }
+
+        if (requestCode == REQUEST_EDIT_WORD) { //результат от EditWordFragment
+            updateUI();
+        }
     }
 
     //обновление списка словарей
     private void updateUI () {
-        WordLab wordLab = WordLab.getWordLab(getActivity());
-        List<Word> words = wordLab.getWords();
-        List<Word> curWords = new ArrayList<>();
-
-        for (Word word : words){
-            if (word.getId().toString().equals(idDictionary.toString())){
-                curWords.add(word);
-            }
-        }
-
-        adapter = new WordAdapter(curWords);
-        wordsRecyclerView.setAdapter(adapter);
+            adapter = new WordRecyclerAdapter(new RealmController().getWordsInfoByParent(DictionaryRealm.class, idDictionary));
+            wordsRecyclerView.setAdapter(adapter);
     }
 
     //ViewHolder для RecyclerView
     private class WordHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        public TextView wordTextView;
-        public TextView translationTextView;
-        public ImageButton menuWordButton;
-        public Word word;
+        private int wordId;
+        private TextView wordTextView;
+        private TextView translationTextView;
+        private ImageButton menuWordButton;
+        private CheckBox wordCheckBox;
 
         public WordHolder(final View itemView) {
             super(itemView);
@@ -169,9 +141,11 @@ public class WordsListFragment extends Fragment {
             menuWordButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    showPopupMenu(menuWordButton, word);
+                   showPopupMenu(menuWordButton, wordId);
                 }
             });
+
+            wordCheckBox = (CheckBox) itemView.findViewById(R.id.wordCheckBox);
         }
 
         @Override
@@ -180,13 +154,12 @@ public class WordsListFragment extends Fragment {
         }
     }
 
-    //Adapter для RecyclerView
-    private class WordAdapter extends RecyclerView.Adapter<WordHolder>{
-        private List<Word> words;
+    private class WordRecyclerAdapter extends RealmRecyclerViewAdapter<WordRealm, WordHolder>{
 
-        public WordAdapter(List<Word> words) {
-            this.words = words;
+        public WordRecyclerAdapter(@Nullable OrderedRealmCollection<WordRealm> data) {
+            super(data, true);
         }
+
 
         @Override
         public WordHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -197,21 +170,23 @@ public class WordsListFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(WordHolder holder, int position) {
-            Word word = words.get(position);
-            holder.wordTextView.setText(word.getWord());
+            final WordRealm word = getItem(position);
+            holder.wordId = word.getWordId();
+            holder.wordTextView.setText(word.getWordTitle());
             holder.translationTextView.setText(word.getTranslation());
-            holder.word = word;
-        }
-
-        @Override
-        public int getItemCount() {
-            return words.size();
+            holder.wordCheckBox.setOnCheckedChangeListener(null);
+            holder.wordCheckBox.setChecked(word.isChecked());
+            holder.wordCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    new RealmController().setCheckedForWord(word, isChecked);
+                }
+            });
         }
     }
 
     //всплывающее меню для слова
- //   private void showPopupMenu (final View view, final UUID id) {
-    private void showPopupMenu (final View view, final Word word) {
+    private void showPopupMenu (final View view, final int wordId) {
         PopupMenu popupMenu = new PopupMenu(getActivity(), view);
         popupMenu.getMenuInflater().inflate(R.menu.word_popup_menu, popupMenu.getMenu());
 
@@ -220,15 +195,13 @@ public class WordsListFragment extends Fragment {
             public boolean onMenuItemClick(MenuItem item) {
                 FragmentManager manager = getFragmentManager();
                 switch (item.getItemId()){
-                    case R.id.change_word_popup_menu:     //диалог преименования словаря
-//                        Dictionary dictionary = DictionaryLab.getDictionaryLab(getActivity()).getDictionary(id);
-//                        String title = dictionary.getTitle();
-//                        RenameDictionaryFragment dialogRename = RenameDictionaryFragment.newInstance(title, id);
-//                        dialogRename.setTargetFragment(WordsListFragment.this, REQUEST_RENAME);
-//                        dialogRename.show(manager, DIALOG_RENAME_POPUP);
+                    case R.id.change_word_popup_menu:     //диалог преименования слова
+                        EditWordFragment dialogChangeWord = EditWordFragment.newInstance(wordId);
+                        dialogChangeWord.setTargetFragment(WordsListFragment.this, REQUEST_EDIT_WORD);
+                        dialogChangeWord.show(manager, DIALOG_EDIT_WORD_POPUP);
                         return true;
-                    case R.id.delete_word_popup_menu:     //диалог удаления словаря
-                        DeleteWordFragment dialogWordDelete = DeleteWordFragment.newInstance(word.getWord());
+                    case R.id.delete_word_popup_menu:     //диалог удаления слова
+                        DeleteWordFragment dialogWordDelete = DeleteWordFragment.newInstance(wordId);
                         dialogWordDelete.setTargetFragment(WordsListFragment.this, REQUEST_WORD_DELETE);
                         dialogWordDelete.show(manager, DIALOG_DELETE_WORD_POPUP);
                         return true;

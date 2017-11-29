@@ -18,14 +18,14 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.fka.rememberwords.data.realm.DictionaryRealm;
+import com.fka.rememberwords.data.realm.RealmController;
 import com.fka.rememberwords.dialogs.DeleteDictionaryFragment;
+import com.fka.rememberwords.dialogs.EditDictionaryFragment;
 import com.fka.rememberwords.dialogs.NewDictionaryFragment;
-import com.fka.rememberwords.dialogs.RenameDictionaryFragment;
-import com.fka.rememberwords.data.DictionaryLab;
-import com.fka.rememberwords.objects.Dictionary;
 
-import java.util.List;
-import java.util.UUID;
+import io.realm.OrderedRealmCollection;
+import io.realm.RealmRecyclerViewAdapter;
 
 //фрагмент со списком словарей и кнопкой добовления нового словоря
 
@@ -40,7 +40,7 @@ public class DictionaryListFragment extends Fragment {
 
     private RecyclerView dictionariesRecyclerView;
     private FloatingActionButton addFAB;
-    private DictionaryAdapter adapter;
+    private DictionaryRecyclerAdapter adapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,39 +79,24 @@ public class DictionaryListFragment extends Fragment {
             return;
         }
 
-        if (requestCode == REQUEST_TITLE) { //результат от NewDictionaryFragment, возвращается наименование нового словаря
-            //создается новый словарь
-            String title = data.getStringExtra(NewDictionaryFragment.EXTRA_TITLE);
-            Dictionary dictionary = new Dictionary(title);
-            DictionaryLab.getDictionaryLab(getActivity()).addDictionary(dictionary);
+        if (requestCode == REQUEST_TITLE) { //результат от NewDictionaryFragment
             updateUI();
         }
 
-        if (requestCode == REQUEST_DELETE) {
-            //удалить выбранный словарь
-            UUID id = (UUID) data.getSerializableExtra(DeleteDictionaryFragment.EXTRA_DEL_UUID);
-            Dictionary dictionary = DictionaryLab.getDictionaryLab(getActivity()).getDictionary(id);
-            DictionaryLab.getDictionaryLab(getActivity()).deleteDictionary(dictionary);
+        if (requestCode == REQUEST_DELETE) {  //результат от DeleteDictionaryFragment
             updateUI();
         }
 
-        if (requestCode == REQUEST_RENAME) {
-            //переиминовать выбранный словарь
-            String title = (String) data.getSerializableExtra(RenameDictionaryFragment.EXTRA_TITLE);
-            UUID id = (UUID) data.getSerializableExtra(RenameDictionaryFragment.EXTRA_RENAME_UUID);
-            Dictionary dictionary = DictionaryLab.getDictionaryLab(getActivity()).getDictionary(id);
-            dictionary.setTitle(title);
-            DictionaryLab.getDictionaryLab(getActivity()).updateDictionary(dictionary);
+        if (requestCode == REQUEST_RENAME) { //результат от RenameDictionaryFragment
             updateUI();
         }
     }
 
     //обновление списка словарей
     private void updateUI () {
-        DictionaryLab dictionaryLab = DictionaryLab.getDictionaryLab(getActivity());
-        List<Dictionary> dictionaries = dictionaryLab.getDictionaries();
-        adapter = new DictionaryAdapter(dictionaries);
+        adapter = new DictionaryRecyclerAdapter(new RealmController().getDictionariesInfo());
         dictionariesRecyclerView.setAdapter(adapter);
+
     }
 
     //ViewHolder для RecyclerView
@@ -121,7 +106,7 @@ public class DictionaryListFragment extends Fragment {
         public TextView countWordsDictionaryTextView;
         public TextView repeatWordsDictionaryTextView;
         public ImageButton menuDictionaryButton;
-        public UUID uuid;
+        public int id;
 
         public DictionaryHolder(final View itemView) {
             super(itemView);
@@ -135,7 +120,7 @@ public class DictionaryListFragment extends Fragment {
             menuDictionaryButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    showPopupMenu(menuDictionaryButton, uuid);
+                    showPopupMenu(menuDictionaryButton, id);
                 }
             });
         }
@@ -144,7 +129,7 @@ public class DictionaryListFragment extends Fragment {
         public void onClick(View view) {
             FragmentManager manager = getFragmentManager();
             manager.beginTransaction()
-                    .replace(R.id.fragment_container, WordsListFragment.newInstance(uuid))
+                    .replace(R.id.fragment_container, WordsListFragment.newInstance(id))
                     .addToBackStack(null)
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .commit();
@@ -152,12 +137,12 @@ public class DictionaryListFragment extends Fragment {
         }
     }
 
-    //Adapter для RecyclerView
-    private class DictionaryAdapter extends RecyclerView.Adapter<DictionaryHolder>{
-        private List<Dictionary> dictionaries;
+    //Адаптер для RealmRecyclerView
+    private class DictionaryRecyclerAdapter extends RealmRecyclerViewAdapter<DictionaryRealm, DictionaryHolder>{
 
-        public DictionaryAdapter(List<Dictionary> dictionaries) {
-            this.dictionaries = dictionaries;
+
+        public DictionaryRecyclerAdapter(@Nullable OrderedRealmCollection<DictionaryRealm> data) {
+            super(data, true);
         }
 
         @Override
@@ -169,19 +154,15 @@ public class DictionaryListFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(DictionaryHolder holder, int position) {
-            Dictionary dictionary = dictionaries.get(position);
-            holder.titleDictionaryTextView.setText(dictionary.getTitle());
-            holder.uuid = dictionary.getId();
-        }
-
-        @Override
-        public int getItemCount() {
-            return dictionaries.size();
+            final DictionaryRealm dictionary = getItem(position);
+            holder.titleDictionaryTextView.setText(dictionary.getDictionaryTitle());
+            holder.id = dictionary.getId();
         }
     }
 
+
     //всплывающее меню для словаря
-    private void showPopupMenu (final View view, final UUID id) {
+    private void showPopupMenu (final View view, final int id) {
         PopupMenu popupMenu = new PopupMenu(getActivity(), view);
         popupMenu.getMenuInflater().inflate(R.menu.didctionary_popup_menu, popupMenu.getMenu());
 
@@ -191,9 +172,9 @@ public class DictionaryListFragment extends Fragment {
                 FragmentManager manager = getFragmentManager();
                 switch (item.getItemId()){
                     case R.id.rename_dictionary_popup_menu:     //диалог преименования словаря
-                        Dictionary dictionary = DictionaryLab.getDictionaryLab(getActivity()).getDictionary(id);
-                        String title = dictionary.getTitle();
-                        RenameDictionaryFragment dialogRename = RenameDictionaryFragment.newInstance(title, id);
+                        DictionaryRealm dictionary = new RealmController().getDictionaryById(id);
+                        String title = dictionary.getDictionaryTitle();
+                        EditDictionaryFragment dialogRename = EditDictionaryFragment.newInstance(title, id);
                         dialogRename.setTargetFragment(DictionaryListFragment.this, REQUEST_RENAME);
                         dialogRename.show(manager, DIALOG_RENAME_POPUP);
                         return true;
@@ -210,5 +191,11 @@ public class DictionaryListFragment extends Fragment {
 
         popupMenu.show();
 
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        new RealmController().closeRealm();
     }
 }

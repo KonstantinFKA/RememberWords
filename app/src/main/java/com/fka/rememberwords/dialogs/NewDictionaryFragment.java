@@ -3,7 +3,6 @@ package com.fka.rememberwords.dialogs;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
@@ -13,11 +12,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import com.fka.rememberwords.R;
+import com.fka.rememberwords.data.realm.RealmController;
 
 //AlertDialog добовления словоря
 
 public class NewDictionaryFragment extends DialogFragment {
-    public static final String EXTRA_TITLE = "com.fka.rememberwords.title";
 
     @NonNull
     @Override
@@ -31,21 +30,18 @@ public class NewDictionaryFragment extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String title = ((TextInputLayout) view.findViewById(R.id.title_name_input_layout)).getEditText().getText().toString();
-                        sendResult(Activity.RESULT_OK, title);
+                        new RealmController().addDictionary(title);
+                        sendResult(Activity.RESULT_OK);
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .create();
     }
 
-    private void sendResult (int resultCode, String title) {
+    private void sendResult (int resultCode) {
         if (getTargetFragment() == null) {
             return;
         }
-
-        Intent intent = new Intent();
-        intent.putExtra(EXTRA_TITLE, title);
-
-        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
+        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, null);
     }
 }

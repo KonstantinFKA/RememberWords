@@ -10,20 +10,19 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 
 import com.fka.rememberwords.R;
-import com.fka.rememberwords.objects.Word;
+import com.fka.rememberwords.data.realm.RealmController;
 
 import java.util.UUID;
 
 //AlertDialog удаления словаря
 
 public class DeleteWordFragment extends DialogFragment {
-    public static final String EXTRA_DEL_WORD = "com.fka.rememberwords.id.delete.word";
     private static final String ARG_DEL_WORD = "word";
 
-    public static DeleteWordFragment newInstance(String word) {
+    public static DeleteWordFragment newInstance(int wordId) {
 
         Bundle args = new Bundle();
-        args.putSerializable(ARG_DEL_WORD, word);
+        args.putSerializable(ARG_DEL_WORD, wordId);
 
         DeleteWordFragment fragment = new DeleteWordFragment();
         fragment.setArguments(args);
@@ -34,26 +33,25 @@ public class DeleteWordFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final String word = (String) getArguments().getSerializable(ARG_DEL_WORD);
+        final int wordId = getArguments().getInt(ARG_DEL_WORD);
 
         return new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.delete_word_text_alertdialog)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        sendResult(Activity.RESULT_OK, word);
+                        new RealmController().removeWord(wordId);
+                        sendResult(Activity.RESULT_OK);
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .create();
     }
 
-    private void sendResult(int resultCode, String word) {
+    private void sendResult(int resultCode) {
         if (getTargetFragment() == null) {
             return;
         }
-        Intent intent = new Intent();
-        intent.putExtra(EXTRA_DEL_WORD, word);
-        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
+        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, null);
     }
 }
