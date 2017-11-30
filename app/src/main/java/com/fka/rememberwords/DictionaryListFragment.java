@@ -50,7 +50,8 @@ public class DictionaryListFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fargment_dictionaries, container, false);
+        //View v = inflater.inflate(R.layout.fargment_dictionaries, container, false);
+        View v = inflater.inflate(R.layout.fragment_main_test, container, false);
 
         addFAB = (FloatingActionButton) v.findViewById(R.id.addFAB);
         addFAB.setOnClickListener(new View.OnClickListener() {

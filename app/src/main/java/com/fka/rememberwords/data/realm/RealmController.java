@@ -56,8 +56,6 @@ public class RealmController {
     //обновить словарь
     public void updateDictionary (int id, String dictionaryTitle){
         realm.beginTransaction();
-
-        //DictionaryRealm dictionary = realm.where(DictionaryRealm.class).equalTo(KEY_DICTIONARY, id).findFirst();
         DictionaryRealm dictionary = getDictionaryById(id);
         dictionary.setDictionaryTitle(dictionaryTitle);
 
@@ -65,13 +63,21 @@ public class RealmController {
     }
 
     //удалить словарь
-    public void removeDictionary(int id){
-        realm.beginTransaction();
+    public void removeDictionary(final int id){
 
-        RealmResults<DictionaryRealm> rows = realm.where(DictionaryRealm.class).equalTo(KEY_DICTIONARY, id).findAll();
-        rows.deleteAllFromRealm();
-
-        realm.commitTransaction();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                DictionaryRealm dictionary = realm.where(DictionaryRealm.class).equalTo(KEY_DICTIONARY, id).findFirst();
+                RealmList<WordRealm> words = dictionary.getWords();
+                if (words == null){
+                    dictionary.deleteFromRealm();
+                } else {
+                    words.deleteAllFromRealm();
+                    dictionary.deleteFromRealm();
+                }
+            }
+        });
     }
 
     //добавить новое слово
