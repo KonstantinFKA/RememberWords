@@ -13,6 +13,7 @@ import io.realm.annotations.Required;
 public class WordRealm extends RealmObject {
 
     public static final String KEY_WORD = "wordId";
+    public static final String KEY_IS_CHECKED = "isChecked";
 
     @PrimaryKey
     private int wordId;

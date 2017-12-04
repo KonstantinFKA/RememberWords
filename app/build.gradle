@@ -33,4 +33,5 @@ dependencies {
     compile 'com.android.support:design:26.1.0'
     compile 'io.realm:android-adapters:2.1.1'
     compile 'in.arjsna:swipecardlib:1.0.2'
+    compile 'com.android.support:cardview-v7:26.1.0'
 }

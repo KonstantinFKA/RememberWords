@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -42,6 +43,8 @@ public class DictionaryListFragment extends Fragment {
     private FloatingActionButton addFAB;
     private DictionaryRecyclerAdapter adapter;
 
+    private Button rememberBtn;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +70,19 @@ public class DictionaryListFragment extends Fragment {
         dictionariesRecyclerView = (RecyclerView) v.findViewById(R.id.dictionariesRecyclerView);
         dictionariesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         dictionariesRecyclerView.addItemDecoration(new ItemDivider(getActivity()));
+
+        rememberBtn = (Button) v.findViewById(R.id.start_remember_fragment_button);
+        rememberBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager manager = getFragmentManager();
+                manager.beginTransaction()
+                        .replace(R.id.fragment_container, new RememberFragment())
+                        .addToBackStack(null)
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                        .commit();
+            }
+        });
 
         updateUI();
 

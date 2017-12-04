@@ -2,6 +2,9 @@ package com.fka.rememberwords.data.realm;
 
 import android.widget.CheckBox;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmModel;
@@ -9,6 +12,7 @@ import io.realm.RealmObject;
 import io.realm.RealmResults;
 
 import static com.fka.rememberwords.data.realm.DictionaryRealm.KEY_DICTIONARY;
+import static com.fka.rememberwords.data.realm.WordRealm.KEY_IS_CHECKED;
 import static com.fka.rememberwords.data.realm.WordRealm.KEY_WORD;
 
 //класс управления БД Realm
@@ -38,6 +42,14 @@ public class RealmController {
     //получить словарь по его id
     public DictionaryRealm getDictionaryById(int id){
         return realm.where(DictionaryRealm.class).equalTo(KEY_DICTIONARY, id).findFirst();
+    }
+
+    public List<WordRealm> getWordsForRemember (){
+        ArrayList<WordRealm> list = new ArrayList<>();
+        RealmResults<WordRealm> realms = realm.where(WordRealm.class).equalTo(KEY_IS_CHECKED, true).findAll();
+        //list.addAll(realm.copyFromRealm(realms));
+        list.addAll(realms);
+        return list;
     }
 
     //получить слово по id
@@ -110,6 +122,15 @@ public class RealmController {
         realm.beginTransaction();
         word.setChecked(isChecked);
         realm.commitTransaction();
+    }
+
+    public void setCheckedForWord(int idWord, boolean isChecked){
+        WordRealm word = getWordById(idWord);
+        setCheckedForWord(word, isChecked);
+    }
+
+    public String getPath(){
+        return realm.getPath();
     }
 
     //удалить слово
