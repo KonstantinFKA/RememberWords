@@ -28,7 +28,7 @@ public class RememberWordsActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         new RealmController().closeRealm(); //закрыть БД Realm при завершении приложения
+        super.onDestroy();
     }
 }

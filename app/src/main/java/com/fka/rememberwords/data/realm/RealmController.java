@@ -1,14 +1,10 @@
 package com.fka.rememberwords.data.realm;
 
-import android.widget.CheckBox;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmList;
-import io.realm.RealmModel;
-import io.realm.RealmObject;
 import io.realm.RealmResults;
 
 import static com.fka.rememberwords.data.realm.DictionaryRealm.KEY_DICTIONARY;
@@ -44,10 +40,10 @@ public class RealmController {
         return realm.where(DictionaryRealm.class).equalTo(KEY_DICTIONARY, id).findFirst();
     }
 
+    //получить список слов для повторения (RememberFragment)
     public List<WordRealm> getWordsForRemember (){
         ArrayList<WordRealm> list = new ArrayList<>();
         RealmResults<WordRealm> realms = realm.where(WordRealm.class).equalTo(KEY_IS_CHECKED, true).findAll();
-        //list.addAll(realm.copyFromRealm(realms));
         list.addAll(realms);
         return list;
     }
@@ -101,7 +97,8 @@ public class RealmController {
         WordRealm word = realm.createObject(WordRealm.class, getNextWordKey());
         word.setWordTitle(wordTitle);
         word.setTranslation(translation);
-        word.setChecked(false);
+        word.setLearn(false);
+        word.setRemember(false);
         dictionary.getWords().add(word);
 
         realm.commitTransaction();
@@ -113,24 +110,35 @@ public class RealmController {
 
         word.setWordTitle(wordTitle);
         word.setTranslation(translation);
-        word.setChecked(isChecked);
+        word.setLearn(isChecked);
 
         realm.commitTransaction();
     }
 
-    public void setCheckedForWord(WordRealm word, boolean isChecked){
+    //устоновить Изучать по параметру Слова
+    public void setLearnForWord(WordRealm word, boolean isLearn){
         realm.beginTransaction();
-        word.setChecked(isChecked);
+        word.setLearn(isLearn);
         realm.commitTransaction();
     }
 
-    public void setCheckedForWord(int idWord, boolean isChecked){
+    //устоновить Изучать по параметру id
+    public void setLearnForWord(int idWord, boolean isChecked){
         WordRealm word = getWordById(idWord);
-        setCheckedForWord(word, isChecked);
+        setLearnForWord(word, isChecked);
     }
 
-    public String getPath(){
-        return realm.getPath();
+    //устоновить Remember по параметру Слова
+    public void setRememberForWord(WordRealm word, boolean isRemember){
+        realm.beginTransaction();
+        word.setRemember(isRemember);
+        realm.commitTransaction();
+    }
+
+    //устоновить Remember по параметру id
+    public void setRememberForWord(int idWord, boolean isRemember){
+        WordRealm word = getWordById(idWord);
+        setRememberForWord(word, isRemember);
     }
 
     //удалить слово

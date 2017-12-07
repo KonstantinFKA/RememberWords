@@ -150,7 +150,9 @@ public class WordsListFragment extends Fragment {
 
         @Override
         public void onClick(View view) {
-            Toast.makeText(getActivity(), "Клик на слове", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Learn "+new RealmController().getWordById(wordId).isLearn()
+                    + "/nRemember " + new RealmController().getWordById(wordId).isRemember(),
+                    Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -175,11 +177,12 @@ public class WordsListFragment extends Fragment {
             holder.wordTextView.setText(word.getWordTitle());
             holder.translationTextView.setText(word.getTranslation());
             holder.wordCheckBox.setOnCheckedChangeListener(null);
-            holder.wordCheckBox.setChecked(word.isChecked());
+            holder.wordCheckBox.setChecked(word.isRemember());
             holder.wordCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    new RealmController().setCheckedForWord(word, isChecked);
+                    //new RealmController().setLearnForWord(word, isChecked);
+                    new RealmController().setRememberForWord(word, isChecked);
                 }
             });
         }

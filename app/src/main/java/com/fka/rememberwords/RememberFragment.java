@@ -8,6 +8,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
@@ -20,10 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import in.arjsna.swipecardlib.SwipeCardView;
-
-/**
- * Created by 074FrantsuzovKA on 30.11.2017.
- */
 
 public class RememberFragment extends Fragment {
     private CardAdapter adapter;
@@ -41,7 +39,7 @@ public class RememberFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_remember, container, false);
 
-        swipeCardView = (SwipeCardView) view.findViewById(R.id.swipeCardView);
+        swipeCardView = view.findViewById(R.id.swipeCardView);
         wordsForRemember = new RealmController().getWordsForRemember();
 
         adapter = new CardAdapter(getActivity(), (ArrayList<WordRealm>) wordsForRemember);
@@ -59,8 +57,9 @@ public class RememberFragment extends Fragment {
 
             @Override
             public void onAdapterAboutToEmpty(int itemsInAdapter) {
+                noWordsToast();
+
                 isLastCard = true;
-                Toast.makeText(getActivity(), "Скоро конец", Toast.LENGTH_SHORT).show();
                 wordsForRemember.addAll(new RealmController().getWordsForRemember());
                 adapter.notifyDataSetChanged();
             }
@@ -84,7 +83,13 @@ public class RememberFragment extends Fragment {
         swipeCardView.setOnItemClickListener(new SwipeCardView.OnItemClickListener() {
             @Override
             public void onItemClicked(int itemPosition, Object dataObject) {
-                Toast.makeText(getActivity(), "Click on Crad", Toast.LENGTH_SHORT).show();
+
+                TextView translation = swipeCardView.getSelectedView().findViewById(R.id.card_word_translation);
+                if (translation.getVisibility() == View.INVISIBLE) {
+                    Animation animation = AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in);
+                    translation.setVisibility(View.VISIBLE);
+                    translation.startAnimation(animation);
+                }
             }
         });
 
@@ -94,9 +99,10 @@ public class RememberFragment extends Fragment {
     private class CardAdapter extends ArrayAdapter<WordRealm> {
         private final ArrayList<WordRealm> words;
         private final LayoutInflater layoutInflater;
+        private TextView translation;
         private Button setChecked;
 
-        public CardAdapter(@NonNull Context context, ArrayList<WordRealm> words) {
+        private CardAdapter(@NonNull Context context, ArrayList<WordRealm> words) {
             super(context, -1);
             this.words = words;
             this.layoutInflater = LayoutInflater.from(context);
@@ -116,19 +122,22 @@ public class RememberFragment extends Fragment {
             }
 
             ((TextView) view.findViewById(R.id.card_word_title)).setText(word.getWordTitle());
-            ((TextView) view.findViewById(R.id.card_word_translation)).setText(word.getTranslation());
-            setChecked = (Button) view.findViewById(R.id.buttonRemember);
+            translation = view.findViewById(R.id.card_word_translation);
+            translation.setText(word.getTranslation());
+            setChecked = view.findViewById(R.id.buttonRemember);
             setChecked.setOnClickListener(null);
 
             setChecked.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    new RealmController().setCheckedForWord(word, false);
+                    new RealmController().setRememberForWord(word, false);
+                    new RealmController().setLearnForWord(word, true);
                     if (isLastCard){
                         wordsForRemember.remove(wordsForRemember.size() - 1);
                     }
                     adapter.notifyDataSetChanged();
                     swipeCardView.throwLeft();
+                    noWordsToast();
                 }
             });
 
@@ -145,6 +154,12 @@ public class RememberFragment extends Fragment {
         @Override
         public int getCount() {
             return words.size();
+        }
+    }
+
+    private void noWordsToast(){
+        if (new RealmController().getWordsForRemember().size() == 0){
+            Toast.makeText(getActivity(), "нет карт", Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -56,7 +56,7 @@ public class EditWordFragment extends DialogFragment {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String newTitle = titleInputLayout.getEditText().getText().toString();
                         String newTranslation = translationInputLayout.getEditText().getText().toString();
-                        new RealmController().updateWord(word, newTitle, newTranslation, word.isChecked());
+                        new RealmController().updateWord(word, newTitle, newTranslation, word.isLearn());
                         sendResult(Activity.RESULT_OK);
 
                     }

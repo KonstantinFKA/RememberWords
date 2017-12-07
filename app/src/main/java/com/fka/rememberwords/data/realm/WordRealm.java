@@ -1,7 +1,5 @@
 package com.fka.rememberwords.data.realm;
 
-import android.widget.CheckBox;
-
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
@@ -13,21 +11,18 @@ import io.realm.annotations.Required;
 public class WordRealm extends RealmObject {
 
     public static final String KEY_WORD = "wordId";
-    public static final String KEY_IS_CHECKED = "isChecked";
+    public static final String KEY_IS_CHECKED = "isRemember";
 
     @PrimaryKey
     private int wordId;
     @Required
     private String wordTitle;
     private String translation;
-    private boolean isChecked;
+    private boolean isLearn;
+    private boolean isRemember;
 
     public int getWordId() {
         return wordId;
-    }
-
-    public void setWordId(int wordId) {
-        this.wordId = wordId;
     }
 
     public String getWordTitle() {
@@ -47,11 +42,19 @@ public class WordRealm extends RealmObject {
     }
 
 
-    public boolean isChecked() {
-        return isChecked;
+    public boolean isLearn() {
+        return isLearn;
     }
 
-    public void setChecked(boolean checked) {
-        isChecked = checked;
+    public void setLearn(boolean learn) {
+        isLearn = learn;
+    }
+
+    public boolean isRemember() {
+        return isRemember;
+    }
+
+    public void setRemember(boolean remember) {
+        isRemember = remember;
     }
 }
