@@ -1,6 +1,7 @@
 package com.fka.rememberwords.data.realm;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import io.realm.Realm;
@@ -8,7 +9,9 @@ import io.realm.RealmList;
 import io.realm.RealmResults;
 
 import static com.fka.rememberwords.data.realm.DictionaryRealm.KEY_DICTIONARY;
-import static com.fka.rememberwords.data.realm.WordRealm.KEY_IS_CHECKED;
+import static com.fka.rememberwords.data.realm.WordRealm.KEY_DATE_REPEAT;
+import static com.fka.rememberwords.data.realm.WordRealm.KEY_IS_LEARN;
+import static com.fka.rememberwords.data.realm.WordRealm.KEY_IS_REMEMBER;
 import static com.fka.rememberwords.data.realm.WordRealm.KEY_WORD;
 
 //класс управления БД Realm
@@ -31,7 +34,6 @@ public class RealmController {
 
     //получить все слова Словаря
     public RealmList<WordRealm> getWordsInfoByParent(Class<DictionaryRealm> dictionaryModel, Integer id){
-
         return realm.where(dictionaryModel).equalTo(KEY_DICTIONARY, id).findFirst().getWords();
     }
 
@@ -40,13 +42,24 @@ public class RealmController {
         return realm.where(DictionaryRealm.class).equalTo(KEY_DICTIONARY, id).findFirst();
     }
 
-    //получить список слов для повторения (RememberFragment)
+    //получить список слов для запоминания (RememberFragment)
     public List<WordRealm> getWordsForRemember (){
         ArrayList<WordRealm> list = new ArrayList<>();
-        RealmResults<WordRealm> realms = realm.where(WordRealm.class).equalTo(KEY_IS_CHECKED, true).findAll();
+        RealmResults<WordRealm> realms = realm.where(WordRealm.class).equalTo(KEY_IS_REMEMBER, true).findAll();
         list.addAll(realms);
         return list;
     }
+
+    //получить список слов для повторения (RepeatFragment)
+    public List<WordRealm> getWordsForRepeat (){
+        ArrayList<WordRealm> list = new ArrayList<>();
+        RealmResults<WordRealm> realms = realm.where(WordRealm.class).equalTo(KEY_IS_LEARN, true)
+                .lessThan(KEY_DATE_REPEAT, new Date())
+                .findAll();
+        list.addAll(realms);
+        return list;
+    }
+
 
     //получить слово по id
     public WordRealm getWordById (int wordId){
@@ -90,7 +103,6 @@ public class RealmController {
 
     //добавить новое слово
     public void addWord (int dictionaryId, String wordTitle, String translation){
-       // DictionaryRealm dictionary = realm.where(DictionaryRealm.class).equalTo(KEY_DICTIONARY, dictionaryId).findFirst();
         DictionaryRealm dictionary = getDictionaryById(dictionaryId);
         realm.beginTransaction();
 
@@ -99,6 +111,11 @@ public class RealmController {
         word.setTranslation(translation);
         word.setLearn(false);
         word.setRemember(false);
+        word.setRep1(false);
+        word.setRep2(false);
+        word.setDateRepeat(new Date());
+        word.setCountRepeat(0);
+        word.setRepeat(false);
         dictionary.getWords().add(word);
 
         realm.commitTransaction();
@@ -151,17 +168,31 @@ public class RealmController {
         realm.commitTransaction();
     }
 
+    //установить повторено дла первой версии повтора
+    public void setRep1ForWord (WordRealm word, boolean isRep1){
+        realm.beginTransaction();
+        word.setRep1(isRep1);
+        realm.commitTransaction();
+    }
+
+    //установить повторено дла второй версии повтора
+    public void setRep2ForWord (WordRealm word, boolean isRep2){
+        realm.beginTransaction();
+        word.setRep2(isRep2);
+        realm.commitTransaction();
+    }
+
     //получить следущее значение ключа для словаря
     private int getNextDictionaryKey(){
         Number maxValue = realm.where(DictionaryRealm.class).max(KEY_DICTIONARY);
         int nextKey = (maxValue != null)? maxValue.intValue() + 1 : 0;
-        return nextKey + 1;
+        return nextKey;
     }
     //получить следущее значение ключа для слова
     private int getNextWordKey(){
         Number maxValue = realm.where(WordRealm.class).max(KEY_WORD);
         int nextKey = (maxValue != null)? maxValue.intValue() + 1 : 0;
-        return nextKey + 1;
+        return nextKey;
     }
 
     //закрыть БД

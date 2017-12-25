@@ -100,7 +100,7 @@ public class RememberFragment extends Fragment {
         private final ArrayList<WordRealm> words;
         private final LayoutInflater layoutInflater;
         private TextView translation;
-        private Button setChecked;
+        private Button setLearnButton;
 
         private CardAdapter(@NonNull Context context, ArrayList<WordRealm> words) {
             super(context, -1);
@@ -124,10 +124,10 @@ public class RememberFragment extends Fragment {
             ((TextView) view.findViewById(R.id.card_word_title)).setText(word.getWordTitle());
             translation = view.findViewById(R.id.card_word_translation);
             translation.setText(word.getTranslation());
-            setChecked = view.findViewById(R.id.buttonRemember);
-            setChecked.setOnClickListener(null);
+            setLearnButton = view.findViewById(R.id.buttonLearn);
+            setLearnButton.setOnClickListener(null);
 
-            setChecked.setOnClickListener(new View.OnClickListener() {
+            setLearnButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     new RealmController().setRememberForWord(word, false);

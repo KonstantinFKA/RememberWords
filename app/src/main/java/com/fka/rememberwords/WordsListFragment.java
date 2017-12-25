@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -150,9 +151,19 @@ public class WordsListFragment extends Fragment {
 
         @Override
         public void onClick(View view) {
-            Toast.makeText(getActivity(), "Learn "+new RealmController().getWordById(wordId).isLearn()
-                    + "/nRemember " + new RealmController().getWordById(wordId).isRemember(),
-                    Toast.LENGTH_SHORT).show();
+            WordRealm word = new RealmController().getWordById(wordId);
+            Log.i("wordInfo", "----------------" +word.getWordId() + "----------------\n"
+                            + "Слово " + word.getWordTitle() + "\n"
+                            + "Перевод " + word.getTranslation() + "\n"
+                            + "На изучении " + word.isLearn() + "\n"
+                            + "На запоминании " + word.isRemember() + "\n"
+                            + "вариант1 " + word.isRep1() + "\n"
+                            + "вариант2 " + word.isRep2() + "\n"
+                            + "Дата повтора " + word.getDateRepeat() + "\n"
+                            + "Количество повторов " + word.getCountRepeat() + "\n"
+                            + "Повторено? " + word.isRepeat() + "\n"
+
+            );
         }
     }
 
@@ -181,7 +192,6 @@ public class WordsListFragment extends Fragment {
             holder.wordCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    //new RealmController().setLearnForWord(word, isChecked);
                     new RealmController().setRememberForWord(word, isChecked);
                 }
             });

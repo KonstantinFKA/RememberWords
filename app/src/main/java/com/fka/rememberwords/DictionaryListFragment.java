@@ -44,6 +44,7 @@ public class DictionaryListFragment extends Fragment {
     private DictionaryRecyclerAdapter adapter;
 
     private Button rememberBtn;
+    private Button repeatButton;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,6 +80,19 @@ public class DictionaryListFragment extends Fragment {
                 manager.beginTransaction()
                         .replace(R.id.fragment_container, new RememberFragment())
                         .addToBackStack(null)
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                        .commit();
+            }
+        });
+
+        repeatButton = (Button) v.findViewById(R.id.start_repeat_fragment_button);
+        repeatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager manager = getFragmentManager();
+                manager.beginTransaction()
+                        .replace(R.id.fragment_container, new RepeatFragment())
+                        .addToBackStack("dictionary_fragment_stack")
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                         .commit();
             }

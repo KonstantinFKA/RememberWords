@@ -4,6 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.fka.rememberwords.data.realm.RealmController;
 
@@ -30,5 +31,13 @@ public class RememberWordsActivity extends AppCompatActivity {
     protected void onDestroy() {
         new RealmController().closeRealm(); //закрыть БД Realm при завершении приложения
         super.onDestroy();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        FragmentManager manager = getSupportFragmentManager();
+        //manager.findFragmentByTag()
+        manager.popBackStack("dictionary_fragment_stack", FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 }
