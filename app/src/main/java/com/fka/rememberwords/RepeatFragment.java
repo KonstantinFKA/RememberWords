@@ -180,12 +180,18 @@ public class RepeatFragment extends Fragment {
                 new RealmController().setRep2ForWord(word, true);
             }
         }
-        FragmentManager manager = getFragmentManager();
-        manager.beginTransaction()
-                .replace(R.id.fragment_container, new RepeatFragment())
-                .addToBackStack(null)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                .commit();
+
+        if (new RealmController().getWordsForRepeat().size() == 0){
+            FragmentManager manager = getFragmentManager();
+            manager.popBackStack("dictionary_fragment_stack", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        } else {
+            FragmentManager manager = getFragmentManager();
+            manager.beginTransaction()
+                    .replace(R.id.fragment_container, new RepeatFragment())
+                    .addToBackStack(null)
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                    .commit();
+        }
     }
 
     private int getRandomFragmentInt(WordRealm word){

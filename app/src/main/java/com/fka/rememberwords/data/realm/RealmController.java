@@ -12,6 +12,8 @@ import static com.fka.rememberwords.data.realm.DictionaryRealm.KEY_DICTIONARY;
 import static com.fka.rememberwords.data.realm.WordRealm.KEY_DATE_REPEAT;
 import static com.fka.rememberwords.data.realm.WordRealm.KEY_IS_LEARN;
 import static com.fka.rememberwords.data.realm.WordRealm.KEY_IS_REMEMBER;
+import static com.fka.rememberwords.data.realm.WordRealm.KEY_REP_1;
+import static com.fka.rememberwords.data.realm.WordRealm.KEY_REP_2;
 import static com.fka.rememberwords.data.realm.WordRealm.KEY_WORD;
 
 //класс управления БД Realm
@@ -54,6 +56,10 @@ public class RealmController {
     public List<WordRealm> getWordsForRepeat (){
         ArrayList<WordRealm> list = new ArrayList<>();
         RealmResults<WordRealm> realms = realm.where(WordRealm.class).equalTo(KEY_IS_LEARN, true)
+                .beginGroup()
+                .equalTo(KEY_REP_1, false)
+                .or().equalTo(KEY_REP_2, false)
+                .endGroup()
                 .lessThan(KEY_DATE_REPEAT, new Date())
                 .findAll();
         list.addAll(realms);

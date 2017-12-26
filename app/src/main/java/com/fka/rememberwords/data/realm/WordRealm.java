@@ -16,6 +16,8 @@ public class WordRealm extends RealmObject {
     public static final String KEY_IS_REMEMBER = "isRemember";
     public static final String KEY_IS_LEARN = "isLearn";
     public static final String KEY_DATE_REPEAT = "dateRepeat";
+    public static final String KEY_REP_1 = "rep1";
+    public static final String KEY_REP_2 = "rep2";
 
     @PrimaryKey
     private int wordId;
