@@ -6,9 +6,6 @@ import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
 
-/**
- * Created by 074FrantsuzovKA on 21.11.2017.
- */
 
 public class WordRealm extends RealmObject {
 

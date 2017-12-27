@@ -87,7 +87,8 @@ public class DictionaryListFragment extends Fragment {
 
         repeatButton = (Button) v.findViewById(R.id.start_repeat_fragment_button);
         if (new RealmController().getWordsForRepeat().size() == 0){
-            repeatButton.setVisibility(View.GONE);
+            repeatButton.setEnabled(false);
+            repeatButton.setText("Нечего повторять");
         }
         repeatButton.setOnClickListener(new View.OnClickListener() {
             @Override

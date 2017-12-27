@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,15 +35,15 @@ public class RepeatFragment extends Fragment {
     private static final int REPEAT_FRAGMENT_V1 = 0;
     private static final int REPEAT_FRAGMENT_V2 = 1;
 
-    private int wrongCount;
+    private int wrongCount;                         //количество неправильных ответов
     private TextView wordForRepeat;
     private EditText translationForRepeat;
     private GridLayout gridLayoutRepeat;
     private TextView repeatTextView;
     private FloatingActionButton okRepeatButton;
-    private List<WordRealm> words;
+    private List<WordRealm> words;                  //список слов для повторения
     private View view;
-    private boolean isCorrectWord = false;
+    private boolean isCorrectWord = false;          //введено правильное слово
 
     @Nullable
     @Override
@@ -53,7 +54,6 @@ public class RepeatFragment extends Fragment {
         final WordRealm word = words.get(new Random().nextInt(words.size()));
         final String wordTranslation = word.getTranslation();
         final String wordTitle = word.getWordTitle();
-        //final int randomFragment = new Random().nextInt(2);
         final int randomFragment = getRandomFragmentInt(word);
 
         //слушатель изменения текста
@@ -103,15 +103,6 @@ public class RepeatFragment extends Fragment {
             okRepeatButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    if (wrongCount < 2 && isCorrectWord){
-//                        new RealmController().setRep1ForWord(word, true);
-//                    }
-//                    FragmentManager manager = getFragmentManager();
-//                    manager.beginTransaction()
-//                            .replace(R.id.fragment_container, new RepeatFragment())
-//                            .addToBackStack(null)
-//                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-//                            .commit();
                     nextRepeatWord(word, REPEAT_FRAGMENT_V1);
                 }
             });
@@ -128,12 +119,6 @@ public class RepeatFragment extends Fragment {
             okRepeatButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    FragmentManager manager = getFragmentManager();
-//                    manager.beginTransaction()
-//                            .replace(R.id.fragment_container, new RepeatFragment())
-//                            .addToBackStack(null)
-//                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-//                            .commit();
                     nextRepeatWord(word, REPEAT_FRAGMENT_V2);
                 }
             });
@@ -179,6 +164,10 @@ public class RepeatFragment extends Fragment {
             } else if (repNumber == REPEAT_FRAGMENT_V2){
                 new RealmController().setRep2ForWord(word, true);
             }
+        }
+
+        if (word.isRep1() && word.isRep2()){
+            new RealmController().setNewDateRepeat(word);
         }
 
         if (new RealmController().getWordsForRepeat().size() == 0){

@@ -1,6 +1,7 @@
 package com.fka.rememberwords.data.realm;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -185,6 +186,43 @@ public class RealmController {
     public void setRep2ForWord (WordRealm word, boolean isRep2){
         realm.beginTransaction();
         word.setRep2(isRep2);
+        realm.commitTransaction();
+    }
+
+    //установка новой даты повторения
+    public void setNewDateRepeat(WordRealm word){
+        int countRepeat = word.getCountRepeat();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        switch (countRepeat){
+            case 0:
+                calendar.add(Calendar.MINUTE, 30);      //первое повторение через 30 минут
+                break;
+            case 1:
+                calendar.add(Calendar.DAY_OF_MONTH, 1); //второе повторение через 1 день
+                break;
+            case 2:
+                calendar.add(Calendar.WEEK_OF_MONTH, 2);    //второе повторение через 2 недели
+                break;
+            case 3:
+                calendar.add(Calendar.MONTH, 2);        //второе повторение через 2 месяца
+                break;
+            default:
+                calendar.add(Calendar.MONTH, 6);        //повторение по умолчанию через 6 месяцев
+        }
+        Date newDate = calendar.getTime();
+
+        realm.beginTransaction();
+        word.setCountRepeat(countRepeat + 1);
+        word.setDateRepeat(newDate);
+        word.setRep1(false);
+        word.setRep2(false);
+        if (countRepeat >= 4){
+            word.setLearn(false);
+            word.setRemember(false);
+            word.setDateRepeat(new Date());
+            word.setCountRepeat(0);
+        }
         realm.commitTransaction();
     }
 
