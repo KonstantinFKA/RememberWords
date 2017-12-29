@@ -3,6 +3,7 @@ package com.fka.rememberwords.data.realm;
 import java.util.Date;
 
 import io.realm.RealmObject;
+import io.realm.annotations.Index;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
 
@@ -10,6 +11,7 @@ import io.realm.annotations.Required;
 public class WordRealm extends RealmObject {
 
     public static final String KEY_WORD = "wordId";
+    public static final String KEY_TITLE = "wordTitle";
     public static final String KEY_IS_REMEMBER = "isRemember";
     public static final String KEY_IS_LEARN = "isLearn";
     public static final String KEY_DATE_REPEAT = "dateRepeat";
@@ -18,7 +20,7 @@ public class WordRealm extends RealmObject {
 
     @PrimaryKey
     private int wordId;
-    @Required
+    @Required@Index
     private String wordTitle;   //слово
     private String translation; //перевод
     private boolean isLearn;    //на изучении
@@ -29,7 +31,6 @@ public class WordRealm extends RealmObject {
 
     private Date dateRepeat;    //дата повторения слова
     private int countRepeat;    //количество поворений
-    private boolean isRepeat;   //слово поторено?
 
 
 
@@ -101,13 +102,5 @@ public class WordRealm extends RealmObject {
 
     public void setCountRepeat(int countRepeat) {
         this.countRepeat = countRepeat;
-    }
-
-    public boolean isRepeat() {
-        return isRepeat;
-    }
-
-    public void setRepeat(boolean repeat) {
-        isRepeat = repeat;
     }
 }

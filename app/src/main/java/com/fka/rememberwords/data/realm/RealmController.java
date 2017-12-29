@@ -15,6 +15,7 @@ import static com.fka.rememberwords.data.realm.WordRealm.KEY_IS_LEARN;
 import static com.fka.rememberwords.data.realm.WordRealm.KEY_IS_REMEMBER;
 import static com.fka.rememberwords.data.realm.WordRealm.KEY_REP_1;
 import static com.fka.rememberwords.data.realm.WordRealm.KEY_REP_2;
+import static com.fka.rememberwords.data.realm.WordRealm.KEY_TITLE;
 import static com.fka.rememberwords.data.realm.WordRealm.KEY_WORD;
 
 //класс управления БД Realm
@@ -117,12 +118,11 @@ public class RealmController {
         word.setWordTitle(wordTitle);
         word.setTranslation(translation);
         word.setLearn(false);
-        word.setRemember(false);
+        word.setRemember(true);
         word.setRep1(false);
         word.setRep2(false);
         word.setDateRepeat(new Date());
         word.setCountRepeat(0);
-        word.setRepeat(false);
         dictionary.getWords().add(word);
 
         realm.commitTransaction();
@@ -176,16 +176,16 @@ public class RealmController {
     }
 
     //установить повторено дла первой версии повтора
-    public void setRep1ForWord (WordRealm word, boolean isRep1){
+    public void setRep1ForWord (WordRealm word, boolean isRepeat){
         realm.beginTransaction();
-        word.setRep1(isRep1);
+        word.setRep1(isRepeat);
         realm.commitTransaction();
     }
 
     //установить повторено дла второй версии повтора
-    public void setRep2ForWord (WordRealm word, boolean isRep2){
+    public void setRep2ForWord (WordRealm word, boolean isRepeat){
         realm.beginTransaction();
-        word.setRep2(isRep2);
+        word.setRep2(isRepeat);
         realm.commitTransaction();
     }
 
@@ -202,10 +202,10 @@ public class RealmController {
                 calendar.add(Calendar.DAY_OF_MONTH, 1); //второе повторение через 1 день
                 break;
             case 2:
-                calendar.add(Calendar.WEEK_OF_MONTH, 2);    //второе повторение через 2 недели
+                calendar.add(Calendar.WEEK_OF_MONTH, 2);    //третье повторение через 2 недели
                 break;
             case 3:
-                calendar.add(Calendar.MONTH, 2);        //второе повторение через 2 месяца
+                calendar.add(Calendar.MONTH, 2);        //четвертое повторение через 2 месяца
                 break;
             default:
                 calendar.add(Calendar.MONTH, 6);        //повторение по умолчанию через 6 месяцев

@@ -161,7 +161,6 @@ public class WordsListFragment extends Fragment {
                             + "вариант2 " + word.isRep2() + "\n"
                             + "Дата повтора " + word.getDateRepeat() + "\n"
                             + "Количество повторов " + word.getCountRepeat() + "\n"
-                            + "Повторено? " + word.isRepeat() + "\n"
 
             );
         }
@@ -170,7 +169,7 @@ public class WordsListFragment extends Fragment {
     private class WordRecyclerAdapter extends RealmRecyclerViewAdapter<WordRealm, WordHolder>{
 
         public WordRecyclerAdapter(@Nullable OrderedRealmCollection<WordRealm> data) {
-            super(data, true);
+            super(data.sort(WordRealm.KEY_TITLE), true);
         }
 
 
