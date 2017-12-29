@@ -1,5 +1,6 @@
 package com.fka.rememberwords;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import com.fka.rememberwords.data.realm.RealmController;
+import com.fka.rememberwords.services.RepeatWordService;
 
 //главная Activity приложения, управляющая всеми фрагментами
 
@@ -25,6 +27,9 @@ public class RememberWordsActivity extends AppCompatActivity {
             fragment = new DictionaryListFragment();
             fm.beginTransaction().add(R.id.fragment_container, fragment).commit();
         }
+
+        Intent repeatWordService = new Intent(this, RepeatWordService.class);
+        startService(repeatWordService);
     }
 
     @Override
